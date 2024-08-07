@@ -46,7 +46,6 @@ namespace ConcurrentDictionaryExtensionsPoC
             {
                 _semaphorePerKey.TryRemove(key, out _);
                 semaphore.Release();
-                Console.WriteLine("Released");
             }
         }
     }

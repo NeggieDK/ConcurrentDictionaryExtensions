@@ -25,7 +25,7 @@ namespace ConcurrentDictionaryExtensionsPoC
             var t1 = new Thread(() =>
             {
                 var sw = Stopwatch.StartNew();
-                _dict2.GetOrAddStampedeProtection("a", FactoryMethod);
+                _dict2.GetOrAdd("a", FactoryMethod);
                 sw.Stop();
                 Console.WriteLine(sw.ElapsedMilliseconds);
             });
@@ -33,7 +33,7 @@ namespace ConcurrentDictionaryExtensionsPoC
             var t2 = new Thread(() =>
             {
                 var sw = Stopwatch.StartNew();
-                _dict2.GetOrAddStampedeProtection("a", FactoryMethod);
+                _dict2.GetOrAdd("a", FactoryMethod);
                 sw.Stop();
                 Console.WriteLine(sw.ElapsedMilliseconds);
             });
@@ -41,7 +41,16 @@ namespace ConcurrentDictionaryExtensionsPoC
             var t3 = new Thread(() =>
             {
                 var sw = Stopwatch.StartNew();
-                _dict2.GetOrAddStampedeProtection("a", FactoryMethod);
+                _dict2.GetOrAdd("a", FactoryMethod);
+                sw.Stop();
+                Console.WriteLine(sw.ElapsedMilliseconds);
+            });
+            
+            var t4 = new Thread(() =>
+            {
+                Thread.Sleep(50);
+                var sw = Stopwatch.StartNew();
+                _dict2.GetOrAdd("a", FactoryMethod);
                 sw.Stop();
                 Console.WriteLine(sw.ElapsedMilliseconds);
             });
@@ -50,10 +59,12 @@ namespace ConcurrentDictionaryExtensionsPoC
             t1.Start();
             t2.Start();
             t3.Start();
+            t4.Start();
 
             t1.Join();
             t2.Join();
             t3.Join();
+            t4.Join();
         }
 
         static string FactoryMethod(string key)
