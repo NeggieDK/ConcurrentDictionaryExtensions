@@ -24,26 +24,30 @@ namespace ConcurrentDictionaryExtensionsPoC
             TKey key,
             Func<TKey, TValue> valueFactory)
         {
-            if (TryGetValue(key, out var result))
+            if (TryGetValue(key, out var value))
             {
-                return result;
+                return value;
             }
 
             var semaphore = GetSemaphoreSpinLock(key);
-            semaphore.Wait();
-            if (TryGetValue(key, out var value))
+            try
+            {
+                semaphore.Wait();
+                if (TryGetValue(key, out value))
+                {
+                    return value;
+                }
+            
+                value = valueFactory.Invoke(key);
+                TryAdd(key, value);
+                return value;
+            }
+            finally
             {
                 _semaphorePerKey.TryRemove(key, out _);
                 semaphore.Release();
-                return value;
+                Console.WriteLine("Released");
             }
-            
-            value = valueFactory.Invoke(key);
-            TryAdd(key, value);
-            _semaphorePerKey.TryRemove(key, out _);
-            semaphore.Release();
-
-            return value;
         }
     }
 }
