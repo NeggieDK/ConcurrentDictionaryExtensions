@@ -12,27 +12,28 @@ namespace ConcurrentDictionaryExtensionsPoC
         }
     }
 
+    [MemoryDiagnoser]
     public class Benchy
     {
-        private static ConcurrentDictionary<string, string> _dict = new ConcurrentDictionary<string, string>();
+        private static ConcurrentDictionary<string, string> _dict1 = new ConcurrentDictionary<string, string>();
+        private static SafeConcurrentDictionary<string, string> _dict2 = new SafeConcurrentDictionary<string, string>();
+
 
         [Benchmark]
-        public void Spinlock()
+        public void Regular()
         {
-            _dict.Clear();
             for (var i = 0; i < 1000; i++)
             {
-                _dict.GetOrAddStampedeProtectionSpinLock(i.ToString(), (key) => key);
+                _dict1.GetOrAdd(i.ToString(), (key) => key);
             }
         }
         
         [Benchmark]
-        public void Lock()
+        public void SafeWithSpinLock()
         {
-            _dict.Clear();
             for (var i = 0; i < 1000; i++)
             {
-                _dict.GetOrAddStampedeProtectionLock(i.ToString(), (key) => key);
+                _dict2.GetOrAddStampedeProtection(i.ToString(), (key) => key);
             }
         }
     }
